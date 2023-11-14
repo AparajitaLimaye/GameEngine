@@ -71,11 +71,11 @@ namespace CPI311.GameEngine
             }
         }
 
-        public void Update()
+        public virtual void Update()
         {
             foreach (IUpdateable component in Updateables) component.Update();
         }
-        public void Draw()
+        public virtual void Draw()
         {
             foreach (IRenderable component in Renderables) component.Draw();
         }

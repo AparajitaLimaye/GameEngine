@@ -11,6 +11,8 @@ namespace Assignment4
 {
      public class Bullet : GameObject
     {
+        //Properties
+        public bool isActive;
 
         //constructor
         public Bullet(ContentManager content, Camera camera, GraphicsDevice graphicsDevice, Light light) : base()
@@ -33,5 +35,25 @@ namespace Assignment4
             collider.Transform = Transform;
             Add<Collider>(collider);
         }
+
+        /*public override void Update()
+        {
+            if (!isActive) return;
+            if (Transform.Position.X > GameConstants.PlayfieldSizeX ||
+            Transform.Position.X < -GameConstants.PlayfieldSizeX ||
+            Transform.Position.Z > GameConstants.PlayfieldSizeY ||
+            Transform.Position.Z < -GameConstants.PlayfieldSizeY)
+            {
+                isActive = false;
+                Rigidbody.Velocity = Vector3.Zero; // stop moving
+            }
+            base.Update();
+        }
+
+        public override void Draw()
+        {
+            if (isActive) base.Draw();
+        }
+        */
     }
 }

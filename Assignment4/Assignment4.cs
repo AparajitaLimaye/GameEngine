@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CPI311.GameEngine;
+using Lab02;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,16 +11,26 @@ namespace Assignment4
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        GameObject gameObject;
+        Ship ship;
+        Camera camera;
+        Transform cameraTransform;
+        Light light;
+        Transform lightTransform;
+
         public Assignment4()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            Time.Initialize();
+            InputManager.Initialize();
+            ScreenManager.Initialize(_graphics);
 
             base.Initialize();
         }
@@ -27,15 +39,30 @@ namespace Assignment4
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            //Camera
+            camera = new Camera();
+            cameraTransform = new Transform();
+            cameraTransform.LocalPosition = Vector3.Backward * 50;
+            camera.Transform = cameraTransform;
+
+            //Light
+            light = new Light();
+            lightTransform = new Transform();
+            lightTransform.LocalPosition = Vector3.Backward * 10 + Vector3.Right * 5;
+            light.Transform = lightTransform;
+
+            //Ship creation
+            ship = new Ship(Content, camera, GraphicsDevice, light);
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            Time.Update(gameTime);
 
-            // TODO: Add your update logic here
+            //gameObject.Update();
+            ship.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -44,7 +71,7 @@ namespace Assignment4
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            ship.Draw();
 
             base.Draw(gameTime);
         }
