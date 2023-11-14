@@ -18,6 +18,16 @@ namespace GoingBeyond
         public const float AsteroidMaxSpeed = 300.0f;
         public const float AsteroidSpeedAdjustment = 5.0f;
 
+        //bullet constants
+        public const int NumBullets = 30;
+        public const float BulletSpeedAdjustment = 100.0f;
+
+        //game rules
+        public const int ShotPenalty = 1;
+        public const int DeathPenalty = 100;
+        public const int WarpPenalty = 50;
+        public const int KillBonus = 25;
+
         public const float AsteroidBoundingSphereScale = 0.95f; //95% size
         public const float ShipBoundingSphereScale = 0.5f; //50% size
     }

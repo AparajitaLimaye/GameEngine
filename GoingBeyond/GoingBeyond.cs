@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Lab02;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+//using SharpDX.Direct2D1;
 using SharpDX.DXGI;
 using System;
 
@@ -28,6 +30,13 @@ namespace GoingBeyond
         Model asteroidModel;
         Matrix[] asteroidTransforms;
         Asteroid[] asteroidList = new Asteroid[GameConstants.NumAsteroids];
+        Model bulletModel;
+        Matrix[] bulletTransforms;
+        Bullet[] bulletList = new Bullet[GameConstants.NumBullets];
+        Texture2D stars;
+        SpriteFont spritefont;
+        int score;
+
         Random random = new Random();
 
         public GoingBeyond()
@@ -107,7 +116,12 @@ namespace GoingBeyond
             ship.model = Content.Load<Model>("p1_wedge");
             asteroidModel = Content.Load<Model>("asteroid4");
             asteroidTransforms = SetupEffectDefaults(asteroidModel);
+            bulletModel = Content.Load<Model>("bullet");
+            bulletTransforms = SetupEffectDefaults(bulletModel);
+            stars = Content.Load<Texture2D>("B1_stars");
             ship.Transforms = SetupEffectDefaults(ship.model);
+            spritefont = Content.Load<SpriteFont>("spriteFont");
+
             soundEngine = Content.Load<SoundEffect>("engine_2");
             soundEngineInstance = soundEngine.CreateInstance();
             soundHyperspaceActivation =
@@ -143,7 +157,7 @@ namespace GoingBeyond
             }
 
             //Get some input.
-            UpdateInput();
+            UpdateInput(gameTime);
 
             //Add velocity to the current position
             ship.Position += ship.Velocity;
@@ -157,6 +171,14 @@ namespace GoingBeyond
                 asteroidList[i].Update(timeDelta);
             }
 
+            for (int i = 0; i < GameConstants.NumBullets; i++)
+            {
+                if (bulletList[i].isActive)
+                {
+                    bulletList[i].Update(timeDelta);
+                }
+            }
+
             //Sound
             //ship‐asteroid collision check
             if (ship.isActive)
@@ -166,30 +188,65 @@ namespace GoingBeyond
                     GameConstants.ShipBoundingSphereScale);
                 for (int i = 0; i < asteroidList.Length; i++)
                 {
-                    BoundingSphere b = new BoundingSphere(asteroidList[i].position,
-                    asteroidModel.Meshes[0].BoundingSphere.Radius *
-                    GameConstants.AsteroidBoundingSphereScale);
-                    if (b.Intersects(shipSphere))
+                    if (asteroidList[i].isActive)
                     {
-                        //blow up ship
-                        soundExplosion3.Play();
-                        ship.isActive = false;
-                        break; //exit the loop
+                        BoundingSphere b = new BoundingSphere(asteroidList[i].position,
+                            asteroidModel.Meshes[0].BoundingSphere.Radius *
+                            GameConstants.AsteroidBoundingSphereScale);
+                        if (b.Intersects(shipSphere))
+                        {
+                            //blow up ship
+                            soundExplosion3.Play();
+                            ship.isActive = false;
+                            asteroidList[i].isActive = false;
+                            break; //exit the loop
+                        }
                     }
                 }
             }
-                base.Update(gameTime);
+
+            //bullet‐asteroid collision check
+            for (int i = 0; i < asteroidList.Length; i++)
+            {
+                if (asteroidList[i].isActive)
+                {
+                    BoundingSphere asteroidSphere =
+                    new BoundingSphere(asteroidList[i].position,
+                    asteroidModel.Meshes[0].BoundingSphere.Radius *
+                    GameConstants.AsteroidBoundingSphereScale);
+                    for (int j = 0; j < bulletList.Length; j++)
+                    {
+                        if (bulletList[j].isActive)
+                        {
+                            BoundingSphere bulletSphere = new BoundingSphere(
+                            bulletList[j].position,
+                            bulletModel.Meshes[0].BoundingSphere.Radius);
+                            if (asteroidSphere.Intersects(bulletSphere))
+                            {
+                                soundExplosion2.Play();
+                                asteroidList[i].isActive = false;
+                                bulletList[j].isActive = false;
+                                break; //no need to check other bullets
+                            }
+                        }
+                    }
+                }
+            }
+
+            base.Update(gameTime);
         }
 
-        protected void UpdateInput()
+        protected void UpdateInput(GameTime gameTime)
         {
+            InputManager.Update();
+
             // Get the game pad state.
             GamePadState currentState = GamePad.GetState(PlayerIndex.One);
-            if (currentState.IsConnected)
-            {
+            //if (currentState.IsConnected)
+            //{
                 ship.Update(currentState);
                 //Play engine sound only when the engine is on.
-                if (currentState.Triggers.Right > 0)
+                if (InputManager.IsKeyPressed(Keys.W))
                 {
                     if (soundEngineInstance.State == SoundState.Stopped)
                     {
@@ -200,27 +257,51 @@ namespace GoingBeyond
                     else
                         soundEngineInstance.Resume();
                 }
-                else if (currentState.Triggers.Right == 0)
+                /*else if (currentState.Triggers.Right == 0)
                 {
                     if (soundEngineInstance.State == SoundState.Playing)
                         soundEngineInstance.Pause();
-                }
+                }*/
                 // In case you get lost, press A to warp back to the center.
-                if (currentState.Buttons.A == ButtonState.Pressed)
+                if (InputManager.IsKeyPressed(Keys.LeftShift))
                 {
                     ship.Position = Vector3.Zero;
                     ship.Velocity = Vector3.Zero;
                     ship.Rotation = 0.0f;
                     soundHyperspaceActivation.Play();
                 }
-            }
+                //are we shooting?
+                if (ship.isActive && InputManager.IsKeyPressed(Keys.Space))
+                {
+                    //add another bullet. Find an inactive bullet slot and use it
+                    //if all bullets slots are used, ignore the user input
+                    for (int i = 0; i < GameConstants.NumBullets; i++)
+                    {
+                        if (!bulletList[i].isActive)
+                        {
+                            bulletList[i].direction = ship.RotationMatrix.Forward;
+                            bulletList[i].speed = GameConstants.BulletSpeedAdjustment;
+                            bulletList[i].position = ship.Position + (200 * bulletList[i].direction);
+                            bulletList[i].isActive = true;
+                            soundWeaponsFire.Play();
+                            score -= GameConstants.ShotPenalty;
+                            break; //exit the loop
+                        }
+                    }
+                }
+            //}
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            
-            if(ship.isActive)
+
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(stars, new Rectangle(0, 0, 800, 600), Color.White);
+            _spriteBatch.DrawString(spritefont, "Score: " + score, new Vector2(100, 50), Color.Black);
+            _spriteBatch.End();
+
+            if (ship.isActive)
             {
                 Matrix shipTransformMatrix = ship.RotationMatrix
                     * Matrix.CreateTranslation(ship.Position);
@@ -234,6 +315,16 @@ namespace GoingBeyond
                     Matrix asteroidTransform =
                         Matrix.CreateTranslation(asteroidList[i].position);
                     DrawModel(asteroidModel, asteroidTransform, asteroidTransforms);
+                }
+            }
+
+            for (int i = 0; i < GameConstants.NumBullets; i++)
+            {
+                if (bulletList[i].isActive)
+                {
+                    Matrix bulletTransform =
+                    Matrix.CreateTranslation(bulletList[i].position);
+                    DrawModel(bulletModel, bulletTransform, bulletTransforms);
                 }
             }
 
