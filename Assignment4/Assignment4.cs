@@ -71,7 +71,7 @@ namespace Assignment4
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            ship.Draw();
+            ship.Draw(camera);
 
             base.Draw(gameTime);
         }
