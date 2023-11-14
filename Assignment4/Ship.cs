@@ -9,5 +9,14 @@ namespace Assignment4
 {
     public class Ship : GameObject
     {
+        Rigidbody rigidbody;
+        SphereCollider collider;
+        Renderer renderer;
+
+        //constructor
+        public Ship() 
+        {
+            
+        }
     }
 }
