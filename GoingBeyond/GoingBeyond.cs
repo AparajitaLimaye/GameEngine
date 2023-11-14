@@ -44,6 +44,7 @@ namespace GoingBeyond
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
         }
 
         private void ResetAsteroids()
@@ -233,18 +234,19 @@ namespace GoingBeyond
                 }
             }
 
+            ship.Update(gameTime);
+
             base.Update(gameTime);
         }
 
         protected void UpdateInput(GameTime gameTime)
         {
             InputManager.Update();
+            Time.Update(gameTime);
 
             // Get the game pad state.
             GamePadState currentState = GamePad.GetState(PlayerIndex.One);
-            //if (currentState.IsConnected)
-            //{
-                ship.Update(currentState);
+                ship.Update(gameTime);
                 //Play engine sound only when the engine is on.
                 if (InputManager.IsKeyPressed(Keys.W))
                 {
@@ -289,7 +291,6 @@ namespace GoingBeyond
                         }
                     }
                 }
-            //}
         }
 
         protected override void Draw(GameTime gameTime)
@@ -298,7 +299,7 @@ namespace GoingBeyond
 
             _spriteBatch.Begin();
             _spriteBatch.Draw(stars, new Rectangle(0, 0, 800, 600), Color.White);
-            _spriteBatch.DrawString(spritefont, "Score: " + score, new Vector2(100, 50), Color.Black);
+            _spriteBatch.DrawString(spritefont, "Score: " + score, new Vector2(100, 50), Color.LimeGreen);
             _spriteBatch.End();
 
             if (ship.isActive)

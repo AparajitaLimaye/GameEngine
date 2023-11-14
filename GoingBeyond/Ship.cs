@@ -53,7 +53,7 @@ namespace GoingBeyond
             }
         }
 
-        public void Update(GamePadState controllerState)
+        public void Update(GameTime gametime)
         {
 
             /*//Rotate the model using the left thumbstick, and scale it down.
@@ -63,28 +63,24 @@ namespace GoingBeyond
             Velocity += RotationMatrix.Forward * VelocityScale *
                 controllerState.Triggers.Right;*/
             InputManager.Update();
-            //Time.Update(gameTime);
+            Time.Update(gametime);
 
             if (InputManager.IsKeyDown(Keys.W))
             {
-                Position += Vector3.Forward; // direction * 0.5f;
+                Position += RotationMatrix.Forward * Time.ElapsedGameTime * 2500f; 
             }
             if (InputManager.IsKeyDown(Keys.S))
             {
-                Rigidbody.Transform.LocalPosition += Vector3.Backward;
+                Position += RotationMatrix.Backward * Time.ElapsedGameTime * 2500f;
             }
-            /*if (InputManager.IsKeyDown(Keys.A))
+            if (InputManager.IsKeyDown(Keys.A))
             {
-                Transform.Rotate(Vector3.Up, Time.ElapsedGameTime);
-                direction = new Vector3((float)Math.Cos(Time.ElapsedGameTime), (float)Math.Sin(Time.ElapsedGameTime), 0f);
-                direction.Normalize();
+                Rotation += 0.1f;
             }
             if (InputManager.IsKeyDown(Keys.D))
             {
-                Transform.Rotate(Vector3.Down, Time.ElapsedGameTime);
-                direction = new Vector3((float)Math.Cos(Time.ElapsedGameTime), (float)Math.Sin(Time.ElapsedGameTime), 0f);
-                direction.Normalize();
-            }*/
+                Rotation -= 0.1f;
+            }
         }
     }
 }
