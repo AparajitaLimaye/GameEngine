@@ -39,6 +39,12 @@ namespace Lab02
         {
             return CurrentKeyboardState.IsKeyDown(key) && PreviousKeyboardState.IsKeyUp(key);
         }
+        //** Lab 11 *****************************
+        public static bool IsKeyReleased(Keys key)
+        {
+            return CurrentKeyboardState.IsKeyUp(key) && PreviousKeyboardState.IsKeyDown(key);
+        }
+        //***************************************
 
         //****Lab 08*******************
         public static Vector2 GetMousePosition()

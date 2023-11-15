@@ -3,6 +3,8 @@ using Lab02;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
+using System;
 
 namespace Lab11
 {
@@ -18,6 +20,10 @@ namespace Lab11
             { Update = update; Draw = draw; }
         }
 
+        //variables
+        Dictionary<String, Scene> scenes;
+        Scene currentScene;
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -25,6 +31,8 @@ namespace Lab11
         Texture2D texture;
         SpriteFont font;
         public Color background = Color.White;
+
+        CheckBox[] guiElements;
 
         public Lab11()
         {
@@ -38,6 +46,7 @@ namespace Lab11
             Time.Initialize();
             InputManager.Initialize();
             ScreenManager.Initialize(_graphics);
+            scenes = new Dictionary<string, Scene>();
 
             base.Initialize();
         }
@@ -49,12 +58,18 @@ namespace Lab11
             texture = Content.Load<Texture2D>("Square");
             font = Content.Load<SpriteFont>("Font");
 
+            scenes.Add("Menu", new Scene(MainMenuUpdate, MainMenuDraw));
+            scenes.Add("Play", new Scene(PlayUpdate, PlayDraw));
+            currentScene = scenes["Menu"];
+
 
             exitButton = new Button();
             exitButton.Texture = texture;
             exitButton.Text = "Exit";
             exitButton.Bounds = new Rectangle(50, 50, 300, 20);
             exitButton.Action += ExitGame;
+
+            guiElements = new CheckBox[guiElements.Length];
         }
 
         void ExitGame(GUIElement element)
@@ -70,6 +85,8 @@ namespace Lab11
             Time.Update(gameTime);
             InputManager.Update();
 
+            currentScene.Update();
+
             exitButton.Update();
 
             base.Update(gameTime);
@@ -82,9 +99,36 @@ namespace Lab11
 
             _spriteBatch.Begin();
             exitButton.Draw(_spriteBatch, font);
+            currentScene.Draw();
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        //private methods
+        void MainMenuUpdate()
+        {
+            foreach (GUIElement element in guiElements)
+                element.Update();
+        }
+        void MainMenuDraw()
+        {
+            _spriteBatch.Begin();
+            foreach (GUIElement element in guiElements)
+                element.Draw(_spriteBatch, font);
+            _spriteBatch.End();
+        }
+        void PlayUpdate()
+        {
+            if (InputManager.IsKeyReleased(Keys.Escape))
+                currentScene = scenes["Menu"];
+        }
+        void PlayDraw()
+        {
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(font, "Play Mode! Press \"Esc\" to go back",
+                Vector2.Zero, Color.Black);
+            _spriteBatch.End();
         }
     }
 }
