@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CPI311.GameEngine;
+using Lab02;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,6 +11,11 @@ namespace Lab11
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        Button exitButton;
+        Texture2D texture;
+        SpriteFont font;
+        public Color background = Color.White;
+
         public Lab11()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -18,7 +25,9 @@ namespace Lab11
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            Time.Initialize();
+            InputManager.Initialize();
+            ScreenManager.Initialize(_graphics);
 
             base.Initialize();
         }
@@ -27,7 +36,20 @@ namespace Lab11
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            texture = Content.Load<Texture2D>("Square");
+            font = Content.Load<SpriteFont>("Font");
+
+
+            exitButton = new Button();
+            exitButton.Texture = texture;
+            exitButton.Text = "Exit";
+            exitButton.Bounds = new Rectangle(50, 50, 300, 20);
+            exitButton.Action += ExitGame;
+        }
+
+        void ExitGame(GUIElement element)
+        {
+            background = (background == Color.White ? Color.Blue : Color.White);
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,16 +57,22 @@ namespace Lab11
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            Time.Update(gameTime);
+            InputManager.Update();
+
+            exitButton.Update();
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            //GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(background);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+            exitButton.Draw(_spriteBatch, font);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

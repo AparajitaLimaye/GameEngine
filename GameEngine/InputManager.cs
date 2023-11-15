@@ -46,5 +46,25 @@ namespace Lab02
             return new Vector2(CurrentMouseState.X, CurrentMouseState.Y);
         }
         //*****************************
+
+        //*** Lab 11***********************
+        public static bool IsMouseReleased(int mouseButton)
+        {
+            //0 - left mouse 1- right mouse 2 - middle mouse
+            switch(mouseButton)
+            {
+                case 0:
+                    return PreviousMouseState.LeftButton == ButtonState.Pressed &&
+                        CurrentMouseState.LeftButton == ButtonState.Released;
+                case 1:
+                    return PreviousMouseState.RightButton == ButtonState.Pressed &&
+                        CurrentMouseState.RightButton == ButtonState.Released;
+                case 2:
+                    return PreviousMouseState.MiddleButton == ButtonState.Pressed &&
+                        CurrentMouseState.MiddleButton == ButtonState.Released;
+                default: return false;
+            }
+        }
+        //*********************************
     }
 }
