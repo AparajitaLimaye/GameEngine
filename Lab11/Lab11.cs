@@ -20,19 +20,20 @@ namespace Lab11
             { Update = update; Draw = draw; }
         }
 
-        //variables
+        //variables Section D
         Dictionary<String, Scene> scenes;
         Scene currentScene;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Button exitButton;
+        //Button exitButton;
         Texture2D texture;
         SpriteFont font;
         public Color background = Color.White;
 
-        CheckBox[] guiElements;
+        //Secion E
+        List<GUIElement> guiElements;
 
         public Lab11()
         {
@@ -47,6 +48,7 @@ namespace Lab11
             InputManager.Initialize();
             ScreenManager.Initialize(_graphics);
             scenes = new Dictionary<string, Scene>();
+            guiElements = new List<GUIElement>();
 
             base.Initialize();
         }
@@ -58,22 +60,51 @@ namespace Lab11
             texture = Content.Load<Texture2D>("Square");
             font = Content.Load<SpriteFont>("Font");
 
+            //section D
             scenes.Add("Menu", new Scene(MainMenuUpdate, MainMenuDraw));
             scenes.Add("Play", new Scene(PlayUpdate, PlayDraw));
             currentScene = scenes["Menu"];
 
 
-            exitButton = new Button();
+           /* exitButton = new Button();
             exitButton.Texture = texture;
             exitButton.Text = "Exit";
             exitButton.Bounds = new Rectangle(50, 50, 300, 20);
-            exitButton.Action += ExitGame;
+            exitButton.Action += ExitGame;*/
 
-            guiElements = new CheckBox[guiElements.Length];
+            CheckBox box = new CheckBox();
+            box.Box = texture;
+            box.Text = "Switch Scene";
+            box.Bounds = new Rectangle(50, 50, 300, 50);
+            box.Action += SwitchScene;
+
+            Button fullButton = new Button();
+            fullButton.Texture = texture;
+            fullButton.Text = "Full Screen Mode";
+            fullButton.Bounds = new Rectangle(50, 200, 300, 10);
+            fullButton.Action += FullScreen;
+
+            //section E
+            //guiElements.Add(exitButton);
+            guiElements.Add(box);
+            guiElements.Add(fullButton);
+
         }
 
         void ExitGame(GUIElement element)
         {
+            background = (background == Color.White ? Color.Blue : Color.White);
+        }
+
+        //Section E
+        void SwitchScene(GUIElement element)
+        {
+            currentScene = scenes["Play"];
+        }
+        void FullScreen(GUIElement element)
+        {
+            ScreenManager.Setup(1920, 1080);
+            //ScreenManager.IsFullScreen = !ScreenManager.IsFullScreen;  //kinda risky
             background = (background == Color.White ? Color.Blue : Color.White);
         }
 
@@ -87,7 +118,7 @@ namespace Lab11
 
             currentScene.Update();
 
-            exitButton.Update();
+            //exitButton.Update();
 
             base.Update(gameTime);
         }
@@ -97,10 +128,10 @@ namespace Lab11
             //GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.Clear(background);
 
-            _spriteBatch.Begin();
-            exitButton.Draw(_spriteBatch, font);
+            //_spriteBatch.Begin();
+            //exitButton.Draw(_spriteBatch, font);
             currentScene.Draw();
-            _spriteBatch.End();
+            //_spriteBatch.End();
 
             base.Draw(gameTime);
         }
