@@ -8,6 +8,16 @@ namespace Lab11
 {
     public class Lab11 : Game
     {
+        //Inner class
+        public class Scene
+        {
+            public delegate void CallMethod();
+            public CallMethod Update;
+            public CallMethod Draw;
+            public Scene(CallMethod update, CallMethod draw)
+            { Update = update; Draw = draw; }
+        }
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
