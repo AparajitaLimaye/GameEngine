@@ -4,8 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using CPI311.GameEngine;
 using Lab02;
 using System;
-using SharpDX.WIC;
-using System.IO;
 using System.Collections.Generic;
 
 namespace Assignment5
