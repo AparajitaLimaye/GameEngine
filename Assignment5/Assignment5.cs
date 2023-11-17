@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using CPI311.GameEngine;
+using Lab02;
 
 namespace Assignment5
 {
@@ -9,16 +11,24 @@ namespace Assignment5
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        TerrainRenderer terrain;
+        Camera camera;
+        Effect effect;
+
         public Assignment5()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            Time.Initialize();
+            InputManager.Initialize();
+            ScreenManager.Initialize(_graphics);
 
             base.Initialize();
         }
@@ -27,7 +37,21 @@ namespace Assignment5
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            terrain = new TerrainRenderer(
+                Content.Load<Texture2D>("mazeH"),
+                Vector2.One * 100, Vector2.One * 200);
+            terrain.NormalMap = Content.Load<Texture2D>("mazeN");
+            terrain.Transform = new Transform();
+            terrain.Transform.LocalScale *= new Vector3(1,5,1);
+            effect = Content.Load<Effect>("TerrainShader");
+            effect.Parameters["AmbientColor"].SetValue(new Vector3(0.1f, 0.1f, 0.1f));
+            effect.Parameters["DiffuseColor"].SetValue(new Vector3(0.1f, 0.1f, 0.1f));
+            effect.Parameters["SpecularColor"].SetValue(new Vector3(0.5f, 0.5f, 0.5f));
+            effect.Parameters["Shininess"].SetValue(20f);
+
+            camera = new Camera();
+            camera.Transform = new Transform();
+            camera.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right * 3 + Vector3.Up * 5;
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,7 +59,8 @@ namespace Assignment5
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            Time.Update(gameTime);
+            InputManager.Update();
 
             base.Update(gameTime);
         }
@@ -44,7 +69,18 @@ namespace Assignment5
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            effect.Parameters["View"].SetValue(camera.View);
+            effect.Parameters["Projection"].SetValue(camera.Projection);
+            effect.Parameters["World"].SetValue(terrain.Transform.World);
+            effect.Parameters["CameraPosition"].SetValue(camera.Transform.Position);
+            effect.Parameters["LightPosition"].SetValue(camera.Transform.Position + Vector3.Up * 10);
+            effect.Parameters["NormalMap"].SetValue(terrain.NormalMap);
+
+            foreach(EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                terrain.Draw();
+            }
 
             base.Draw(gameTime);
         }
