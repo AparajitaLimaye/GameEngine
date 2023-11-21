@@ -5,6 +5,7 @@ using CPI311.GameEngine;
 using Lab02;
 using System;
 using System.Collections.Generic;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Assignment5
 {
@@ -12,10 +13,13 @@ namespace Assignment5
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private GraphicsDevice graphicsDevice;
 
         Camera camera;
         Random random = new Random();
         const int Size = 20;
+        Light light;
+        SpriteFont font;
 
         //Developing Maze Terrain : Lab 10
         TerrainRenderer terrain;
@@ -27,9 +31,14 @@ namespace Assignment5
         Model cube;
         Model sphere;
 
+        //Player stuff
+        GameObject gameObject;
+        Player player;
+
         public Assignment5()
         {
             _graphics = new GraphicsDeviceManager(this);
+            //graphicsDevice = new GraphicsDevice(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
@@ -71,12 +80,18 @@ namespace Assignment5
                 current = current.Parent;
             }
 
+            //** Player
+            player = new Player(terrain, Content, camera, graphicsDevice, light);
+            player.Transform.LocalPosition = new Vector3(0,10,0);
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            font = Content.Load<SpriteFont>("font");
 
             //*** Terrain Maze
             terrain = new TerrainRenderer(
@@ -93,6 +108,11 @@ namespace Assignment5
 
             cube = Content.Load<Model>("cube");
             sphere = Content.Load<Model>("Sphere");
+
+            //** Player
+            player = new Player(terrain, Content, camera, graphicsDevice, light);
+            player.Transform.LocalPosition = new Vector3(3, 60, 15);
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -102,6 +122,9 @@ namespace Assignment5
 
             Time.Update(gameTime);
             InputManager.Update();
+            player.Update();
+
+            Console.WriteLine("Player position: " + player.Transform.LocalPosition);
 
             base.Update(gameTime);
         }
@@ -116,12 +139,13 @@ namespace Assignment5
             effect.Parameters["CameraPosition"].SetValue(camera.Transform.Position);
             effect.Parameters["LightPosition"].SetValue(camera.Transform.Position + Vector3.Up * 10);
             effect.Parameters["NormalMap"].SetValue(terrain.NormalMap);
-
-            foreach(EffectPass pass in effect.CurrentTechnique.Passes)
+            
+            //Terrain stuff
+            /*foreach(EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 terrain.Draw();
-            }
+            }*/
 
             foreach(AStarNode node in search.Nodes)
                 if(!node.Passable)
@@ -130,6 +154,15 @@ namespace Assignment5
             foreach(Vector3 position in path)
                 sphere.Draw(Matrix.CreateScale(0.1f, 0.1f, 0.1f) *
                     Matrix.CreateTranslation(position), camera.View, camera.Projection);
+
+            //Player stuff
+            player.Draw();
+
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
+            _spriteBatch.DrawString(font, "Terrain position: " + terrain.Transform.LocalPosition, new Vector2(0, 15), Color.Black);
+            _spriteBatch.DrawString(font, "Camera position: " + camera.Transform.LocalPosition, new Vector2(0, 30), Color.Black);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
