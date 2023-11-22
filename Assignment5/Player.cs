@@ -29,7 +29,7 @@ namespace Assignment5
             Rigidbody rigidbody = new Rigidbody();
             rigidbody.Transform = Transform;
             rigidbody.Mass = 1;
-            gameObject.Add<Rigidbody>(rigidbody);
+            this.Add<Rigidbody>(rigidbody);
         }
 
         public override void Update()
@@ -38,13 +38,13 @@ namespace Assignment5
 
             //Control the player
             if (InputManager.IsKeyDown(Keys.W)) //move forward
-                gameObject.Transform.LocalPosition += Vector3.Forward;
+                this.Transform.LocalPosition += Vector3.Forward;
             if (InputManager.IsKeyDown(Keys.S)) //move backward
-                gameObject.Transform.LocalPosition += Vector3.Backward;
+                this.Transform.LocalPosition += Vector3.Backward;
             if (InputManager.IsKeyDown(Keys.A)) //move left
-                gameObject.Transform.LocalPosition += Vector3.Left;
+                this.Transform.LocalPosition += Vector3.Left;
             if (InputManager.IsKeyDown(Keys.D)) //move right
-                gameObject.Transform.LocalPosition += Vector3.Right;
+                this.Transform.LocalPosition += Vector3.Right;
 
 
             //make sure that the player is at the right altitude of the terrain
@@ -58,7 +58,7 @@ namespace Assignment5
 
         public void Draw(Camera camera)
         {
-            model.Draw(gameObject.Transform.World, camera.View, camera.Projection);
+            model.Draw(this.Transform.World, camera.View, camera.Projection);
             base.Draw();
         }
     }
