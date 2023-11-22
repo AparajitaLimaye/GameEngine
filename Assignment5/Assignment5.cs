@@ -106,8 +106,8 @@ namespace Assignment5
             sphere = Content.Load<Model>("Sphere");
 
             //** Player
-            gameObject = new Player(terrain, Content, camera, graphicsDevice, light);
-            gameObject.Transform.LocalPosition = new Vector3(3, 10, 15);
+            player = new Player(terrain, Content, camera, graphicsDevice, light);
+            player.Transform.LocalPosition = new Vector3(3, 10, 15);
 
         }
 
@@ -118,7 +118,7 @@ namespace Assignment5
 
             Time.Update(gameTime);
             InputManager.Update();
-            gameObject.Update();
+            player.Update();
 
             //Console.WriteLine("Player position: " + player.Transform.LocalPosition);
 
@@ -152,10 +152,10 @@ namespace Assignment5
                     Matrix.CreateTranslation(position), camera.View, camera.Projection);
 
             //Player stuff
-            gameObject.Draw();
+            player.Draw();
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, "Player position: " + gameObject.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
+            _spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
             _spriteBatch.DrawString(font, "Terrain position: " + terrain.Transform.LocalPosition, new Vector2(0, 15), Color.Black);
             _spriteBatch.DrawString(font, "Camera position: " + camera.Transform.LocalPosition, new Vector2(0, 30), Color.Black);
             _spriteBatch.End();
