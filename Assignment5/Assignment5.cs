@@ -80,10 +80,6 @@ namespace Assignment5
                 current = current.Parent;
             }
 
-            //** Player
-            player = new Player(terrain, Content, camera, graphicsDevice, light);
-            player.Transform.LocalPosition = new Vector3(0,10,0);
-
             base.Initialize();
         }
 
@@ -110,8 +106,8 @@ namespace Assignment5
             sphere = Content.Load<Model>("Sphere");
 
             //** Player
-            player = new Player(terrain, Content, camera, graphicsDevice, light);
-            player.Transform.LocalPosition = new Vector3(3, 60, 15);
+            gameObject = new Player(terrain, Content, camera, graphicsDevice, light);
+            gameObject.Transform.LocalPosition = new Vector3(3, 10, 15);
 
         }
 
@@ -122,9 +118,9 @@ namespace Assignment5
 
             Time.Update(gameTime);
             InputManager.Update();
-            player.Update();
+            gameObject.Update();
 
-            Console.WriteLine("Player position: " + player.Transform.LocalPosition);
+            //Console.WriteLine("Player position: " + player.Transform.LocalPosition);
 
             base.Update(gameTime);
         }
@@ -156,10 +152,10 @@ namespace Assignment5
                     Matrix.CreateTranslation(position), camera.View, camera.Projection);
 
             //Player stuff
-            player.Draw();
+            gameObject.Draw();
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
+            _spriteBatch.DrawString(font, "Player position: " + gameObject.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
             _spriteBatch.DrawString(font, "Terrain position: " + terrain.Transform.LocalPosition, new Vector2(0, 15), Color.Black);
             _spriteBatch.DrawString(font, "Camera position: " + camera.Transform.LocalPosition, new Vector2(0, 30), Color.Black);
             _spriteBatch.End();
