@@ -131,20 +131,20 @@ namespace CPI311.GameEngine
             //***************
         }
 
-/*        //*** Assignment 3 ********************************
+        //*** Assignment 3 ********************************
         public void Update() 
         {
             UpdateWorld();
 
-            GameObject gameObject = new GameObject();
+            /*GameObject gameObject = new GameObject();
             Rigidbody rigidbody = new Rigidbody();
             gameObject.Add<Rigidbody>(rigidbody);
             SphereCollider sphereCollider = new SphereCollider();
             gameObject.Add<Collider>(sphereCollider);
             Renderer renderer = new Renderer();
             gameObject.Add<Renderer>(renderer);
-            gameObjects.Add(gameObject); // add this to the list.
-        }*/
+            gameObjects.Add(gameObject); // add this to the list.*/
+        }
 
         public void Rotate(Vector3 axis, float angle) //able to rotate an object on its local axis
         {

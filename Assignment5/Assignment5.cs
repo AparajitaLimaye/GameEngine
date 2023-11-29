@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using CPI311.GameEngine;
 using Lab02;
-using System;
-using System.Collections.Generic;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Assignment5
@@ -13,11 +11,8 @@ namespace Assignment5
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private GraphicsDevice graphicsDevice;
 
         Camera camera;
-        Random random = new Random();
-        const int Size = 20;
         Light light;
         SpriteFont font;
 
@@ -25,21 +20,14 @@ namespace Assignment5
         TerrainRenderer terrain;
         Effect effect;
 
-        //Create grid and search algorithm: Lab 9
-        AStarSearch search;
-        List<Vector3> path;
-        Model cube;
-        Model sphere;
-
         //Player stuff
-        GameObject gameObject;
         Player player;
-        //Agent agent
+        Agent agent;
 
         public Assignment5()
         {
             _graphics = new GraphicsDeviceManager(this);
-            //graphicsDevice = new GraphicsDevice(this);
+            //graphicsDevice = new GraphicsDevice(_graphics);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
@@ -62,7 +50,7 @@ namespace Assignment5
             //First Person View
             //camera.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right*3 + Vector3.Up * 5;
 
-            //*** Grid
+           /* //*** Grid
             search = new AStarSearch(Size, Size); //size of grid
             foreach (AStarNode node in search.Nodes)
                 if (random.NextDouble() < 0.2)
@@ -79,7 +67,7 @@ namespace Assignment5
             {
                 path.Insert(0, current.Position);
                 current = current.Parent;
-            }
+            }*/
 
             base.Initialize();
         }
@@ -92,9 +80,9 @@ namespace Assignment5
 
             //*** Terrain Maze
             terrain = new TerrainRenderer(
-                Content.Load<Texture2D>("mazeH"),
+                Content.Load<Texture2D>("mazeH2"),
                 Vector2.One * 100, Vector2.One * 200);
-            terrain.NormalMap = Content.Load<Texture2D>("mazeN");
+            terrain.NormalMap = Content.Load<Texture2D>("mazeN2");
             terrain.Transform = new Transform();
             terrain.Transform.LocalScale *= new Vector3(1,5,1);
             effect = Content.Load<Effect>("TerrainShader");
@@ -114,23 +102,22 @@ namespace Assignment5
             light.Transform = new Transform();
             light.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right * 5 + Vector3.Up * 5;
 
-            cube = Content.Load<Model>("cube");
-            sphere = Content.Load<Model>("Sphere");
-
             //** Player
-            player = new Player(terrain, Content, camera, graphicsDevice, light);
+            player = new Player(terrain, Content, camera, GraphicsDevice, light);
             //player.Transform.LocalPosition = new Vector3(3, 10, 15);
+            agent = new Agent(terrain, Content, camera, GraphicsDevice, light);
 
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            /*if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();*/
 
             Time.Update(gameTime);
             InputManager.Update();
             player.Update();
+            agent.Update();
 
             if (InputManager.IsKeyDown(Keys.Up)) camera.Transform.Rotate(Vector3.Right, Time.ElapsedGameTime);
             if (InputManager.IsKeyDown(Keys.Down)) camera.Transform.Rotate(Vector3.Left, Time.ElapsedGameTime);
@@ -156,6 +143,7 @@ namespace Assignment5
                 pass.Apply();
                 terrain.Draw();
                 player.Draw();
+                agent.Draw();
             }
 
             /*foreach(AStarNode node in search.Nodes)

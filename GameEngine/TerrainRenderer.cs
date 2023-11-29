@@ -89,8 +89,8 @@ namespace CPI311.GameEngine
             if (position.X > -size.X / 2 && position.X < size.X / 2 && 
                 position.Z > -size.Y / 2 && position.Z < size.Y / 2)
                 return GetHeight( new Vector2(
-                    (position.X - size.X/2)/size.X,
-                    (position.Z - size.Y/2)/ size.Y) 
+                    (position.X + size.X/2)/size.X,
+                    (position.Z + size.Y/2)/ size.Y) 
                     ) * Transform.LocalScale.Y;
             return -1;
         }
