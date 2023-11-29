@@ -4,11 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assignment5
 {
@@ -22,14 +17,25 @@ namespace Assignment5
         public Player(TerrainRenderer terrain, ContentManager Content, Camera camera,
             GraphicsDevice graphicsDevice, Light light) : base()
         {
-            model = Content.Load<Model>("Torus");
+            model = Content.Load<Model>("Sphere");
             Terrain = terrain;
 
             //Rigidbody
             Rigidbody rigidbody = new Rigidbody();
             rigidbody.Transform = Transform;
             rigidbody.Mass = 1;
-            this.Add<Rigidbody>(rigidbody);
+            Add<Rigidbody>(rigidbody);
+
+            //Sphere Collider
+            SphereCollider collider = new SphereCollider();
+            collider.Radius = 1;
+            collider.Transform = Transform;
+            Add<Collider>(collider);
+
+            //Renderer
+            Texture2D texture = Content.Load<Texture2D>("Square");
+            Renderer renderer = new Renderer(model, Transform, camera, Content, graphicsDevice, light, 1, "SimpleShading", 20f, texture);
+            Add<Renderer>(renderer);
         }
 
         public override void Update()
@@ -38,20 +44,20 @@ namespace Assignment5
 
             //Control the player
             if (InputManager.IsKeyDown(Keys.W)) //move forward
-                this.Transform.LocalPosition += Vector3.Forward;
+                this.Transform.LocalPosition += this.Transform.Forward * Time.ElapsedGameTime * 10f;
             if (InputManager.IsKeyDown(Keys.S)) //move backward
-                this.Transform.LocalPosition += Vector3.Backward;
+                this.Transform.LocalPosition += this.Transform.Backward * Time.ElapsedGameTime * 10f; ;
             if (InputManager.IsKeyDown(Keys.A)) //move left
-                this.Transform.LocalPosition += Vector3.Left;
+                this.Transform.LocalPosition += this.Transform.Left * Time.ElapsedGameTime * 10f; ;
             if (InputManager.IsKeyDown(Keys.D)) //move right
-                this.Transform.LocalPosition += Vector3.Right;
+                this.Transform.LocalPosition += this.Transform.Right * Time.ElapsedGameTime * 10f; ;
 
 
             //make sure that the player is at the right altitude of the terrain
-            /*this.Transform.LocalPosition = new Vector3(
+            this.Transform.LocalPosition = new Vector3(
                 this.Transform.LocalPosition.X,
-                10,
-                this.Transform.LocalPosition.Z);*/
+                Terrain.GetAltitude(this.Transform.LocalPosition),
+                this.Transform.LocalPosition.Z) + Vector3.Up;
 
             base.Update();
         }

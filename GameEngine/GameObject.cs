@@ -30,7 +30,6 @@ namespace CPI311.GameEngine
             Renderables = new List<IRenderable>();
             Drawables = new List<IDrawable>();
         }
-
         public T Add<T>() where T : Component, new()
         {
             Remove<T>();
@@ -46,6 +45,7 @@ namespace CPI311.GameEngine
 
         public void Add<T>(T component) where T : Component
         {
+            Remove<T>();
             component.GameObject = this;
             component.Transform = Transform;
             Components.Add(typeof(T), component);
@@ -79,7 +79,7 @@ namespace CPI311.GameEngine
         {
             foreach (IRenderable component in Renderables) component.Draw();
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             foreach (IDrawable component in Drawables) component.Draw(spriteBatch);
         }

@@ -34,6 +34,7 @@ namespace Assignment5
         //Player stuff
         GameObject gameObject;
         Player player;
+        //Agent agent
 
         public Assignment5()
         {
@@ -52,12 +53,12 @@ namespace Assignment5
             ScreenManager.Initialize(_graphics);
 
             //**** Camera
-            camera = new Camera();
+            /*camera = new Camera();
             camera.Transform = new Transform();
             //Top Down View
             camera.Transform.LocalPosition = Vector3.Backward * 15 + Vector3.Right * 3 + Vector3.Up * 55;
             camera.Transform.Rotate(Vector3.Left, 20.3f);
-
+            */
             //First Person View
             //camera.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right*3 + Vector3.Up * 5;
 
@@ -99,15 +100,26 @@ namespace Assignment5
             effect = Content.Load<Effect>("TerrainShader");
             effect.Parameters["AmbientColor"].SetValue(new Vector3(0.1f, 0.1f, 0.1f));
             effect.Parameters["DiffuseColor"].SetValue(new Vector3(0.1f, 0.1f, 0.1f));
-            effect.Parameters["SpecularColor"].SetValue(new Vector3(0.5f, 0.5f, 0.5f));
+            effect.Parameters["SpecularColor"].SetValue(new Vector3(0.2f, 0.2f, 0.2f)); //all 0.2
             effect.Parameters["Shininess"].SetValue(20f);
+
+            //**** Camera
+            camera = new Camera();
+            camera.Transform = new Transform();
+            camera.Transform.LocalPosition = Vector3.Up * 50;
+            camera.Transform.Rotate(Vector3.Left, MathHelper.PiOver2-0.2f);
+
+            //* light
+            light = new Light();
+            light.Transform = new Transform();
+            light.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right * 5 + Vector3.Up * 5;
 
             cube = Content.Load<Model>("cube");
             sphere = Content.Load<Model>("Sphere");
 
             //** Player
             player = new Player(terrain, Content, camera, graphicsDevice, light);
-            player.Transform.LocalPosition = new Vector3(3, 10, 15);
+            //player.Transform.LocalPosition = new Vector3(3, 10, 15);
 
         }
 
@@ -120,6 +132,8 @@ namespace Assignment5
             InputManager.Update();
             player.Update();
 
+            if (InputManager.IsKeyDown(Keys.Up)) camera.Transform.Rotate(Vector3.Right, Time.ElapsedGameTime);
+            if (InputManager.IsKeyDown(Keys.Down)) camera.Transform.Rotate(Vector3.Left, Time.ElapsedGameTime);
             //Console.WriteLine("Player position: " + player.Transform.LocalPosition);
 
             base.Update(gameTime);
@@ -133,26 +147,27 @@ namespace Assignment5
             effect.Parameters["Projection"].SetValue(camera.Projection);
             effect.Parameters["World"].SetValue(terrain.Transform.World);
             effect.Parameters["CameraPosition"].SetValue(camera.Transform.Position);
-            effect.Parameters["LightPosition"].SetValue(camera.Transform.Position + Vector3.Up * 10);
+            effect.Parameters["LightPosition"].SetValue(light.Transform.Position);
             effect.Parameters["NormalMap"].SetValue(terrain.NormalMap);
             
             //Terrain stuff
-            /*foreach(EffectPass pass in effect.CurrentTechnique.Passes)
+            foreach(EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 terrain.Draw();
-            }*/
+                player.Draw();
+            }
 
-            foreach(AStarNode node in search.Nodes)
+            /*foreach(AStarNode node in search.Nodes)
                 if(!node.Passable)
                     cube.Draw(Matrix.CreateScale(0.5f, 0.05f, 0.5f) *
                         Matrix.CreateTranslation(node.Position), camera.View, camera.Projection);
             foreach(Vector3 position in path)
                 sphere.Draw(Matrix.CreateScale(0.1f, 0.1f, 0.1f) *
-                    Matrix.CreateTranslation(position), camera.View, camera.Projection);
+                    Matrix.CreateTranslation(position), camera.View, camera.Projection);*/
 
-            //Player stuff
-            player.Draw();
+            /*//Player stuff
+            player.Draw();*/
 
             _spriteBatch.Begin();
             _spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
