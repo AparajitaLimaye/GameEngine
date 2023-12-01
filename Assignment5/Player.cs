@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
 
 namespace Assignment5
 {
@@ -41,16 +42,17 @@ namespace Assignment5
         public override void Update()
         {
             InputManager.Update();
-
+            /*Debug.WriteLine("Forward: " + ((this.Transform.LocalPosition + this.Transform.Forward).Y) +
+                "Backward: " + (Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Backward * Time.ElapsedGameTime * 10f)));*/
             //Control the player
-            if (InputManager.IsKeyDown(Keys.W)) //move forward
-                this.Transform.LocalPosition += this.Transform.Forward * Time.ElapsedGameTime * 10f;
-            if (InputManager.IsKeyDown(Keys.S)) //move backward
-                this.Transform.LocalPosition += this.Transform.Backward * Time.ElapsedGameTime * 10f; ;
-            if (InputManager.IsKeyDown(Keys.A)) //move left
-                this.Transform.LocalPosition += this.Transform.Left * Time.ElapsedGameTime * 10f; ;
-            if (InputManager.IsKeyDown(Keys.D)) //move right
-                this.Transform.LocalPosition += this.Transform.Right * Time.ElapsedGameTime * 10f; ;
+                if (InputManager.IsKeyDown(Keys.W) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Forward * Time.ElapsedGameTime * 10f) > 1)) //move forward
+                    this.Transform.LocalPosition += this.Transform.Forward * Time.ElapsedGameTime * 10f;
+                if (InputManager.IsKeyDown(Keys.S) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Backward * Time.ElapsedGameTime * 10f) > 1)) //move backward
+                    this.Transform.LocalPosition += this.Transform.Backward * Time.ElapsedGameTime * 10f; 
+                if (InputManager.IsKeyDown(Keys.A) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Left * Time.ElapsedGameTime * 10f) > 1)) //move left
+                    this.Transform.LocalPosition += this.Transform.Left * Time.ElapsedGameTime * 10f; 
+                if (InputManager.IsKeyDown(Keys.D) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Right * Time.ElapsedGameTime * 10f) > 1)) //move right
+                    this.Transform.LocalPosition += this.Transform.Right * Time.ElapsedGameTime * 10f; 
 
 
             //make sure that the player is at the right altitude of the terrain

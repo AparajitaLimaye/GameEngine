@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using CPI311.GameEngine;
 using Lab02;
 using Color = Microsoft.Xna.Framework.Color;
+using System.Collections.Generic;
 
 namespace Assignment5
 {
@@ -20,9 +21,12 @@ namespace Assignment5
         TerrainRenderer terrain;
         Effect effect;
 
-        //Player stuff
+        //Player and Agents stuff
         Player player;
-        Agent agent;
+        List<Agent> agents;
+
+        //game
+        int agentCaught = 0;
 
         public Assignment5()
         {
@@ -104,9 +108,13 @@ namespace Assignment5
 
             //** Player
             player = new Player(terrain, Content, camera, GraphicsDevice, light);
+            agents = new List<Agent>();
             //player.Transform.LocalPosition = new Vector3(3, 10, 15);
-            agent = new Agent(terrain, Content, camera, GraphicsDevice, light);
-
+            for(int i = 0; i < 3; i++)
+            {
+                Agent agent = new Agent(terrain, Content, camera, GraphicsDevice, light);
+                agents.Add(agent);
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -117,11 +125,25 @@ namespace Assignment5
             Time.Update(gameTime);
             InputManager.Update();
             player.Update();
-            agent.Update();
+
+            for(int i = 0;i < 3;i++)
+            {
+                agents[i].Update();
+            }
 
             if (InputManager.IsKeyDown(Keys.Up)) camera.Transform.Rotate(Vector3.Right, Time.ElapsedGameTime);
             if (InputManager.IsKeyDown(Keys.Down)) camera.Transform.Rotate(Vector3.Left, Time.ElapsedGameTime);
             //Console.WriteLine("Player position: " + player.Transform.LocalPosition);
+
+            //Catching Alien
+            for(int j = 0; j < 3;j++)
+            {
+                if (player.Collider.Collides(agents[j].Collider, out Vector3 normal))
+                {
+                    agents[j].RandomPathFinding();
+                    agentCaught++;
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -143,7 +165,10 @@ namespace Assignment5
                 pass.Apply();
                 terrain.Draw();
                 player.Draw();
-                agent.Draw();
+                for(int i = 0; i < 3;i++)
+                {
+                    agents[i].Draw();
+                }
             }
 
             /*foreach(AStarNode node in search.Nodes)
@@ -161,6 +186,8 @@ namespace Assignment5
             _spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
             _spriteBatch.DrawString(font, "Terrain position: " + terrain.Transform.LocalPosition, new Vector2(0, 15), Color.Black);
             _spriteBatch.DrawString(font, "Camera position: " + camera.Transform.LocalPosition, new Vector2(0, 30), Color.Black);
+            _spriteBatch.DrawString(font, "Agents caught: " + agentCaught, new Vector2(0, 45), Color.Black);
+            _spriteBatch.DrawString(font, "Time Spent: " + Time.TotalGameTime, new Vector2(0, 60), Color.Black);
             _spriteBatch.End();
 
             base.Draw(gameTime);

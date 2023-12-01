@@ -13,7 +13,7 @@ namespace Assignment5
     public class Agent : GameObject
     {
         public AStarSearch search;
-        List<Vector3> path;
+        public List<Vector3> path;
 
         private float speed = 5f; //moving speed
         private int gridSize = 20; //grid size
@@ -107,7 +107,7 @@ namespace Assignment5
             base.Update();
         }
 
-        private Vector3 GetGridPosition(Vector3 gridPos)
+        public Vector3 GetGridPosition(Vector3 gridPos)
         {
             float gridW = Terrain.size.X / search.Cols;
             float gridH = Terrain.size.Y / search.Rows;
@@ -116,7 +116,7 @@ namespace Assignment5
                 0,
                 gridH * gridPos.Z + gridH / 2 - Terrain.size.Y / 2);
         }
-        private void RandomPathFinding()
+        public void RandomPathFinding()
         {
             Random random = new Random();
             while (!(search.Start = search.Nodes[random.Next(search.Rows), random.Next(search.Cols)]).Passable)
