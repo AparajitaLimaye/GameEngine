@@ -113,6 +113,7 @@ namespace FinalGame
             //section D
             scenes.Add("Menu", new Scene(MainMenuUpdate, MainMenuDraw));
             scenes.Add("Play", new Scene(PlayUpdate, PlayDraw));
+            scenes.Add("EndCredits", new Scene(EndCreditsUpdate, EndCreditsDraw));
             currentScene = scenes["Menu"];
 
 
@@ -126,19 +127,26 @@ namespace FinalGame
             box.Texture = texture;
             //box.Texture
             box.Text = "                                                                       PLAY";
-            box.Bounds = new Rectangle(100, 300, 600, 50);
+            box.Bounds = new Rectangle(100, 200, 600, 50);
             box.Action += PlayScene;
 
             Button fullButton = new Button();
             fullButton.Texture = texture;
             fullButton.Text = "                                                            Full Screen Mode";
-            fullButton.Bounds = new Rectangle(100, 400, 600, 50);
+            fullButton.Bounds = new Rectangle(100, 300, 600, 50);
             fullButton.Action += FullScreen;
+
+            Button endCredits = new Button();
+            endCredits.Texture = texture;
+            endCredits.Text = "                                                                   Credits";
+            endCredits.Bounds = new Rectangle(100, 400, 600, 50);
+            endCredits.Action += EndCreditScene;
 
             //section E
             //guiElements.Add(exitButton);
             guiElements.Add(box);
             guiElements.Add(fullButton);
+            guiElements.Add(endCredits);
             //***************************************
 
             //*** Terrain Maze
@@ -239,7 +247,26 @@ namespace FinalGame
 
             _spriteBatch.Begin();
             _spriteBatch.DrawString(font, "Play Mode! Press \"Esc\" to go back",
-                Vector2.Zero, Color.Black);
+                Vector2.Zero, Color.White);
+            _spriteBatch.End();
+        }
+        void EndCreditScene(GUIElement element)
+        {
+            currentScene = scenes["EndCredits"];
+        }
+        void EndCreditsUpdate()
+        {
+            if (InputManager.IsKeyReleased(Keys.Escape))
+                currentScene = scenes["Menu"];
+            background = Color.Blue;
+        }
+        void EndCreditsDraw()
+        {
+            _spriteBatch.Begin();
+           /* foreach (GUIElement element in guiElements)
+                element.Draw(_spriteBatch, font);*/
+            _spriteBatch.DrawString(font, "Created by ME! Aparajita Limaye", new Vector2(300, 150), Color.Red);
+            _spriteBatch.DrawString(font, "Press Esc to go back to the Menu", new Vector2(300, 200), Color.Red);
             _spriteBatch.End();
         }
 
