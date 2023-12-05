@@ -23,7 +23,7 @@ namespace FinalGame
         public Agent(TerrainRenderer terrain, ContentManager Content, Camera camera,
             GraphicsDevice graphicsDevice, Light light) : base()
         {
-            model = Content.Load<Model>("Sphere");
+            model = Content.Load<Model>("YoshiSphere");
             Terrain = terrain;
             path = null;
 
@@ -40,7 +40,7 @@ namespace FinalGame
             Add<Collider>(collider);
 
             //Renderer
-            Texture2D texture = Content.Load<Texture2D>("Square");
+            Texture2D texture = Content.Load<Texture2D>("image");
             Renderer renderer = new Renderer(model, Transform, camera, Content, graphicsDevice, light, 1, "SimpleShading", 20f, texture);
             Add<Renderer>(renderer);
 
