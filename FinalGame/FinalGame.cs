@@ -35,9 +35,13 @@ namespace FinalGame
         //Player and Agents stuff
         Player player;
         List<Agent> agents;
+        List<Bomb> assignments;
+        Bomb bomb;
+        Bullet bullet;
 
         //game
-        int agentCaught = 0;
+        int professorCatch = 0;
+        int assignmentsKilled = 0;
 
         //*** LAB 11 **********************
         //variables Section D
@@ -79,26 +83,6 @@ namespace FinalGame
             */
             //First Person View
             //camera.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right*3 + Vector3.Up * 5;
-
-            /* //*** Grid
-             search = new AStarSearch(Size, Size); //size of grid
-             foreach (AStarNode node in search.Nodes)
-                 if (random.NextDouble() < 0.2)
-                     search.Nodes[random.Next(Size), random.Next(Size)].Passable = false;
-             search.Start = search.Nodes[0, 0];
-             search.Start.Passable = true;
-             search.End = search.Nodes[Size - 1, Size - 1];
-             search.End.Passable = true;
-
-             search.Search(); // a search is made here
-             path = new List<Vector3>();
-             AStarNode current = search.End;
-             while (current != null)
-             {
-                 path.Insert(0, current.Position);
-                 current = current.Parent;
-             }*/
-
             base.Initialize();
         }
 
@@ -179,12 +163,21 @@ namespace FinalGame
             //** Player
             player = new Player(terrain, Content, camera, GraphicsDevice, light);
             agents = new List<Agent>();
+            assignments = new List<Bomb>();
             //player.Transform.LocalPosition = new Vector3(3, 10, 15);
             for (int i = 0; i < 3; i++)
             {
                 Agent agent = new Agent(terrain, Content, camera, GraphicsDevice, light);
                 agents.Add(agent);
             }
+            //*** Bomb
+            for (int i = 0; i < 3; i++)
+            {
+                Bomb bomb = new Bomb(terrain, Content, camera, GraphicsDevice, light, player);
+                assignments.Add(bomb);
+            }
+            //** Bullet
+            bullet = new Bullet(Content, camera, GraphicsDevice, light, player);
         }
         void ExitGame(GUIElement element)
         {
@@ -224,7 +217,10 @@ namespace FinalGame
         }
         void PlayDraw()
         {
-            //GraphicsDevice.Clear(background);
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            player.Draw();
+            bullet.Draw();
 
             effect.Parameters["View"].SetValue(camera.View);
             effect.Parameters["Projection"].SetValue(camera.Projection);
@@ -238,7 +234,10 @@ namespace FinalGame
             {
                 pass.Apply();
                 terrain.Draw();
-                player.Draw();
+                for (int i = 0; i < 3; i++)
+                {
+                    assignments[i].Draw();
+                }
                 for (int i = 0; i < 3; i++)
                 {
                     agents[i].Draw();
@@ -270,6 +269,24 @@ namespace FinalGame
             _spriteBatch.End();
         }
 
+        protected void restart()
+        {
+            player.Transform.LocalPosition = new Vector3(3, terrain.GetAltitude(player.Transform.LocalPosition), 10);
+            for (int i = 0; i < 3; i++)
+            {
+                assignments[i].RandomPathFinding();
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                agents[i].RandomPathFinding();
+            }
+            professorCatch = 0;
+            player.Transform.LocalPosition = new Vector3(
+                player.Transform.LocalPosition.X,
+                terrain.GetAltitude(player.Transform.LocalPosition),
+                player.Transform.LocalPosition.Z) + Vector3.Up;
+        }
+
         protected override void Update(GameTime gameTime)
         {
             /*if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -279,6 +296,11 @@ namespace FinalGame
             InputManager.Update();
             currentScene.Update();
             player.Update();
+            bullet.Update();
+            for (int i = 0; i < 3; i++)
+            {
+                assignments[i].Update();
+            }
 
             for (int i = 0; i < 3; i++)
             {
@@ -295,7 +317,23 @@ namespace FinalGame
                 if (player.Collider.Collides(agents[j].Collider, out Vector3 normal))
                 {
                     agents[j].RandomPathFinding();
-                    agentCaught++;
+                    professorCatch++;
+                }
+            }
+            //Assignments catching you
+            for (int j = 0; j < 3; j++)
+            {
+                if (player.Collider.Collides(assignments[j].Collider, out Vector3 normal1))
+                {
+                    restart();
+                }
+            }
+            //Bullet kills a bomb
+            for (int j = 0; j < 3; j++)
+            {
+                if (bullet.Collider.Collides(assignments[j].Collider, out Vector3 normal2))
+                {
+                    assignments[j].RandomPathFinding();
                 }
             }
 

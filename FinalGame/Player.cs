@@ -43,7 +43,6 @@ namespace FinalGame
 
         public override void Update()
         {
-            InputManager.Update();
             /*Debug.WriteLine("Forward: " + ((this.Transform.LocalPosition + this.Transform.Forward).Y) +
                 "Backward: " + (Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Backward * Time.ElapsedGameTime * 10f)));*/
             //Control the player
