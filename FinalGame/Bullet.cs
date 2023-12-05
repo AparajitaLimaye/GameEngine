@@ -51,19 +51,27 @@ namespace FinalGame
         public override void Update()
         {
 
-            if (!isActive)
-                return;
-
             if (InputManager.IsKeyPressed(Keys.Space))
             {
                 Debug.WriteLine("In Here");
+                isActive = true;
                 Transform.Position = player.Transform.Position;
                 Transform.LocalRotation = player.Transform.LocalRotation;
-                Rigidbody.Velocity = Transform.Forward * 3f;
+                Rigidbody.Velocity = Transform.Forward * 10f;
                 //Debug.WriteLine("In Here");
             }
+            
 
             base.Update();
+        }
+
+        public override void Draw()
+        {
+            if (!isActive)
+                return;
+
+            base.Draw();
+
         }
     }
 }

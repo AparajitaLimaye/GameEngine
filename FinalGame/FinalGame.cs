@@ -245,8 +245,10 @@ namespace FinalGame
             }
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, "Play Mode! Press \"Esc\" to go back",
-                Vector2.Zero, Color.White);
+            _spriteBatch.DrawString(font, "Play Mode! Press \"Esc\" to go back", Vector2.Zero, Color.White);
+            _spriteBatch.DrawString(font, "Assignments Killed: " + assignmentsKilled, new Vector2(0, 15), Color.White);
+            _spriteBatch.DrawString(font, "Professors caught: " + professorCatch, new Vector2(0, 30), Color.White);
+            _spriteBatch.DrawString(font, "Time Spent: " + Time.TotalGameTime, new Vector2(0, 45), Color.White);
             _spriteBatch.End();
         }
         void EndCreditScene(GUIElement element)
@@ -333,6 +335,16 @@ namespace FinalGame
             {
                 if (bullet.Collider.Collides(assignments[j].Collider, out Vector3 normal2))
                 {
+                    bullet.isActive = false;
+                    assignments[j].isActive = false;
+                }
+            }
+            //Bullet kills a bomb
+            for (int j = 0; j < 3; j++)
+            {
+                if (!assignments[j].isActive)
+                {
+                    assignmentsKilled++;
                     assignments[j].RandomPathFinding();
                 }
             }

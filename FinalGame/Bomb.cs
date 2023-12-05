@@ -20,10 +20,12 @@ namespace FinalGame
         private TerrainRenderer Terrain;
         Model model;
         Player player;
+        public bool isActive;
 
         public Bomb(TerrainRenderer terrain, ContentManager Content, Camera camera,
             GraphicsDevice graphicsDevice, Light light, Player playr) : base()
         {
+            isActive = true;
             model = Content.Load<Model>("Sphere");
             Terrain = terrain;
             path = null;
@@ -116,11 +118,12 @@ namespace FinalGame
             float gridH = Terrain.size.Y / search.Rows;
             return new Vector3(
                 gridW * gridPos.X + gridW / 2 - Terrain.size.X / 2,
-                0,
+                1,
                 gridH * gridPos.Z + gridH / 2 - Terrain.size.Y / 2);
         }
         public void RandomPathFinding()
         {
+            isActive = true;
             Random random = new Random();
             if (path == null)
             {
@@ -135,7 +138,7 @@ namespace FinalGame
             int xPlayer = (int)((player.Transform.LocalPosition.X + 45) / 5) % search.Rows + 1;
             int zPlayer = (int)((player.Transform.LocalPosition.Z + 45) / 5) % search.Cols + 1;
             search.End = search.Nodes[xPlayer, zPlayer]; //player position
-            Debug.WriteLine("curr player:" + search.End.Position);
+            //Debug.WriteLine("curr player:" + search.End.Position);
             search.Search();
             path = new List<Vector3>();
             AStarNode current = search.End;
