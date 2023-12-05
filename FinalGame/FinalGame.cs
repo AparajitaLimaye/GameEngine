@@ -5,11 +5,22 @@ using CPI311.GameEngine;
 using Lab02;
 using Color = Microsoft.Xna.Framework.Color;
 using System.Collections.Generic;
+using System;
 
 namespace FinalGame
 {
     public class FinalGame : Game
     {
+        //Inner class
+        public class Scene
+        {
+            public delegate void CallMethod();
+            public CallMethod Update;
+            public CallMethod Draw;
+            public Scene(CallMethod update, CallMethod draw)
+            { Update = update; Draw = draw; }
+        }
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -28,6 +39,19 @@ namespace FinalGame
         //game
         int agentCaught = 0;
 
+        //*** LAB 11 **********************
+        //variables Section D
+        Dictionary<String, Scene> scenes;
+        Scene currentScene;
+
+        //Button exitButton;
+        Texture2D texture;
+        public Color background = Color.White;
+
+        //Secion E
+        List<GUIElement> guiElements;
+        //*******************************
+
         public FinalGame()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -43,6 +67,8 @@ namespace FinalGame
             Time.Initialize();
             InputManager.Initialize();
             ScreenManager.Initialize(_graphics);
+            scenes = new Dictionary<string, Scene>();
+            guiElements = new List<GUIElement>();
 
             //**** Camera
             /*camera = new Camera();
@@ -80,7 +106,40 @@ namespace FinalGame
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            texture = Content.Load<Texture2D>("Square");
             font = Content.Load<SpriteFont>("font");
+
+            //*** LAB 11 SCENE CHANGE ***************
+            //section D
+            scenes.Add("Menu", new Scene(MainMenuUpdate, MainMenuDraw));
+            scenes.Add("Play", new Scene(PlayUpdate, PlayDraw));
+            currentScene = scenes["Menu"];
+
+
+            /* exitButton = new Button();
+             exitButton.Texture = texture;
+             exitButton.Text = "Exit";
+             exitButton.Bounds = new Rectangle(50, 50, 300, 20);
+             exitButton.Action += ExitGame;*/
+
+            Button box = new Button();
+            box.Texture = texture;
+            //box.Texture
+            box.Text = "                                                                       PLAY";
+            box.Bounds = new Rectangle(100, 300, 600, 50);
+            box.Action += PlayScene;
+
+            Button fullButton = new Button();
+            fullButton.Texture = texture;
+            fullButton.Text = "                                                            Full Screen Mode";
+            fullButton.Bounds = new Rectangle(100, 400, 600, 50);
+            fullButton.Action += FullScreen;
+
+            //section E
+            //guiElements.Add(exitButton);
+            guiElements.Add(box);
+            guiElements.Add(fullButton);
+            //***************************************
 
             //*** Terrain Maze
             terrain = new TerrainRenderer(
@@ -119,6 +178,70 @@ namespace FinalGame
                 agents.Add(agent);
             }
         }
+        void ExitGame(GUIElement element)
+        {
+            background = (background == Color.White ? Color.Blue : Color.White);
+        }
+
+        //Section E
+        void PlayScene(GUIElement element)
+        {
+            currentScene = scenes["Play"];
+        }
+        void FullScreen(GUIElement element)
+        {
+            ScreenManager.Setup(1920, 1080);
+            //ScreenManager.IsFullScreen = !ScreenManager.IsFullScreen;  //kinda risky
+            background = (background == Color.White ? Color.Blue : Color.White);
+        }
+        //private methods
+        void MainMenuUpdate()
+        {
+            foreach (GUIElement element in guiElements)
+                element.Update();
+            background = Color.Blue;
+        }
+        void MainMenuDraw()
+        {
+            _spriteBatch.Begin();
+            foreach (GUIElement element in guiElements)
+                element.Draw(_spriteBatch, font);
+            _spriteBatch.DrawString(font, "I'M STRESSED", new Vector2(350, 150), Color.Red);
+            _spriteBatch.End();
+        }
+        void PlayUpdate()
+        {
+            if (InputManager.IsKeyReleased(Keys.Escape))
+                currentScene = scenes["Menu"];
+        }
+        void PlayDraw()
+        {
+            //GraphicsDevice.Clear(background);
+
+            effect.Parameters["View"].SetValue(camera.View);
+            effect.Parameters["Projection"].SetValue(camera.Projection);
+            effect.Parameters["World"].SetValue(terrain.Transform.World);
+            effect.Parameters["CameraPosition"].SetValue(camera.Transform.Position);
+            effect.Parameters["LightPosition"].SetValue(light.Transform.Position);
+            effect.Parameters["NormalMap"].SetValue(terrain.NormalMap);
+
+            //Terrain stuff
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                terrain.Draw();
+                player.Draw();
+                for (int i = 0; i < 3; i++)
+                {
+                    agents[i].Draw();
+                }
+            }
+
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(font, "Play Mode! Press \"Esc\" to go back",
+                Vector2.Zero, Color.Black);
+            _spriteBatch.End();
+        }
 
         protected override void Update(GameTime gameTime)
         {
@@ -127,6 +250,7 @@ namespace FinalGame
 
             Time.Update(gameTime);
             InputManager.Update();
+            currentScene.Update();
             player.Update();
 
             for (int i = 0; i < 3; i++)
@@ -153,9 +277,12 @@ namespace FinalGame
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            //GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(background);
 
-            effect.Parameters["View"].SetValue(camera.View);
+            currentScene.Draw();
+
+            /*effect.Parameters["View"].SetValue(camera.View);
             effect.Parameters["Projection"].SetValue(camera.Projection);
             effect.Parameters["World"].SetValue(terrain.Transform.World);
             effect.Parameters["CameraPosition"].SetValue(camera.Transform.Position);
@@ -172,7 +299,7 @@ namespace FinalGame
                 {
                     agents[i].Draw();
                 }
-            }
+            }*/
 
             /*foreach(AStarNode node in search.Nodes)
                 if(!node.Passable)
@@ -182,15 +309,12 @@ namespace FinalGame
                 sphere.Draw(Matrix.CreateScale(0.1f, 0.1f, 0.1f) *
                     Matrix.CreateTranslation(position), camera.View, camera.Projection);*/
 
-            /*//Player stuff
-            player.Draw();*/
-
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
+            /*_spriteBatch.DrawString(font, "Player position: " + player.Transform.LocalPosition, new Vector2(0, 0), Color.Black);
             _spriteBatch.DrawString(font, "Terrain position: " + terrain.Transform.LocalPosition, new Vector2(0, 15), Color.Black);
             _spriteBatch.DrawString(font, "Camera position: " + camera.Transform.LocalPosition, new Vector2(0, 30), Color.Black);
             _spriteBatch.DrawString(font, "Agents caught: " + agentCaught, new Vector2(0, 45), Color.Black);
-            _spriteBatch.DrawString(font, "Time Spent: " + Time.TotalGameTime, new Vector2(0, 60), Color.Black);
+            _spriteBatch.DrawString(font, "Time Spent: " + Time.TotalGameTime, new Vector2(0, 60), Color.Black);*/
             _spriteBatch.End();
 
             base.Draw(gameTime);
