@@ -65,13 +65,6 @@ namespace Lab11
             scenes.Add("Play", new Scene(PlayUpdate, PlayDraw));
             currentScene = scenes["Menu"];
 
-
-           /* exitButton = new Button();
-            exitButton.Texture = texture;
-            exitButton.Text = "Exit";
-            exitButton.Bounds = new Rectangle(50, 50, 300, 20);
-            exitButton.Action += ExitGame;*/
-
             CheckBox box = new CheckBox();
             box.Box = texture;
             box.Text = "Switch Scene";
@@ -104,7 +97,6 @@ namespace Lab11
         void FullScreen(GUIElement element)
         {
             ScreenManager.Setup(1920, 1080);
-            //ScreenManager.IsFullScreen = !ScreenManager.IsFullScreen;  //kinda risky
             background = (background == Color.White ? Color.Blue : Color.White);
         }
 
@@ -118,8 +110,6 @@ namespace Lab11
 
             currentScene.Update();
 
-            //exitButton.Update();
-
             base.Update(gameTime);
         }
 
@@ -129,7 +119,6 @@ namespace Lab11
             GraphicsDevice.Clear(background);
 
             //_spriteBatch.Begin();
-            //exitButton.Draw(_spriteBatch, font);
             currentScene.Draw();
             //_spriteBatch.End();
 

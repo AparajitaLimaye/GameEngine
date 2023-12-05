@@ -6,6 +6,7 @@ using Lab02;
 using Color = Microsoft.Xna.Framework.Color;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 
 namespace FinalGame
 {
@@ -42,6 +43,8 @@ namespace FinalGame
         //game
         int professorCatch = 0;
         int assignmentsKilled = 0;
+        int numAssignments = 3;
+        bool inLvl2 = false;
 
         //*** LAB 11 **********************
         //variables Section D
@@ -171,7 +174,7 @@ namespace FinalGame
                 agents.Add(agent);
             }
             //*** Bomb
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < numAssignments; i++)
             {
                 Bomb bomb = new Bomb(terrain, Content, camera, GraphicsDevice, light, player);
                 assignments.Add(bomb);
@@ -234,7 +237,7 @@ namespace FinalGame
             {
                 pass.Apply();
                 terrain.Draw();
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < numAssignments; i++)
                 {
                     assignments[i].Draw();
                 }
@@ -249,7 +252,11 @@ namespace FinalGame
             _spriteBatch.DrawString(font, "Assignments Killed: " + assignmentsKilled, new Vector2(0, 15), Color.White);
             _spriteBatch.DrawString(font, "Professors caught: " + professorCatch, new Vector2(0, 30), Color.White);
             _spriteBatch.DrawString(font, "Time Spent: " + Time.TotalGameTime, new Vector2(0, 45), Color.White);
-            _spriteBatch.End();
+            if (assignmentsKilled > 2)
+            {
+                _spriteBatch.DrawString(font, "LEVEL 2!", new Vector2(0, 60), Color.White);
+            }
+                _spriteBatch.End();
         }
         void EndCreditScene(GUIElement element)
         {
@@ -273,8 +280,9 @@ namespace FinalGame
 
         protected void restart()
         {
+            //assignmentsKilled = 0;
             player.Transform.LocalPosition = new Vector3(3, terrain.GetAltitude(player.Transform.LocalPosition), 10);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < numAssignments; i++)
             {
                 assignments[i].RandomPathFinding();
             }
@@ -299,7 +307,7 @@ namespace FinalGame
             currentScene.Update();
             player.Update();
             bullet.Update();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < numAssignments; i++)
             {
                 assignments[i].Update();
             }
@@ -316,6 +324,7 @@ namespace FinalGame
             //Catching Alien
             for (int j = 0; j < 3; j++)
             {
+
                 if (player.Collider.Collides(agents[j].Collider, out Vector3 normal))
                 {
                     agents[j].RandomPathFinding();
@@ -323,16 +332,20 @@ namespace FinalGame
                 }
             }
             //Assignments catching you
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < numAssignments; j++)
             {
+                if (!assignments[j].isActive) continue;
+
                 if (player.Collider.Collides(assignments[j].Collider, out Vector3 normal1))
                 {
                     restart();
                 }
             }
             //Bullet kills a bomb
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < numAssignments; j++)
             {
+                if(!bullet.isActive || !assignments[j].isActive) continue;
+
                 if (bullet.Collider.Collides(assignments[j].Collider, out Vector3 normal2))
                 {
                     bullet.isActive = false;
@@ -340,12 +353,24 @@ namespace FinalGame
                 }
             }
             //Bullet kills a bomb
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < numAssignments; j++)
             {
                 if (!assignments[j].isActive)
                 {
                     assignmentsKilled++;
+                    Debug.WriteLine("AssKill: " + assignmentsKilled);
                     assignments[j].RandomPathFinding();
+                }
+            }
+            if(assignmentsKilled > 2 && !inLvl2)
+            {
+                inLvl2 = true;
+                restart();
+                numAssignments = 6;
+                for (int i = 0; i < 3; i++)
+                {
+                    Bomb bomb = new Bomb(terrain, Content, camera, GraphicsDevice, light, player);
+                    assignments.Add(bomb);
                 }
             }
 

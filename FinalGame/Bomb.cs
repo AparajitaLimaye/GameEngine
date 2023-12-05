@@ -63,12 +63,8 @@ namespace FinalGame
                     if (Terrain.GetAltitude(pos) > 1.0)
                     {
                         search.Nodes[j, i].Passable = false;
-                        Debug.WriteLine("return: " + Terrain.GetAltitude(pos));
                     }
                 }
-            /*for (int i = 0; i < gridSize; i++)
-                for (int j = 0; j < gridSize; j++)
-                    Debug.WriteLine("Is it false? search.Nodes[" + j + ", " + i + " = " + search.Nodes[j, i].Passable);*/
 
         }
 

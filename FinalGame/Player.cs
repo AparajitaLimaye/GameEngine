@@ -43,8 +43,6 @@ namespace FinalGame
 
         public override void Update()
         {
-            /*Debug.WriteLine("Forward: " + ((this.Transform.LocalPosition + this.Transform.Forward).Y) +
-                "Backward: " + (Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Backward * Time.ElapsedGameTime * 10f)));*/
             //Control the player
             if (InputManager.IsKeyDown(Keys.W) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Forward * Time.ElapsedGameTime * 10f) > 1))//move forward
             {
