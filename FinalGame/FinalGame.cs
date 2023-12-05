@@ -373,6 +373,10 @@ namespace FinalGame
                     assignments.Add(bomb);
                 }
             }
+            if(assignmentsKilled > 6 && inLvl2) 
+            {
+                currentScene = scenes["EndCredits"];
+            }
 
             base.Update(gameTime);
         }
