@@ -14,12 +14,14 @@ namespace FinalGame
         public TerrainRenderer Terrain { get; set; }
         Model model;
         GameObject gameObject = new GameObject();
+        Camera Camera;
 
         public Player(TerrainRenderer terrain, ContentManager Content, Camera camera,
             GraphicsDevice graphicsDevice, Light light) : base()
         {
             model = Content.Load<Model>("Sphere");
             Terrain = terrain;
+            Camera = camera;
 
             //Rigidbody
             Rigidbody rigidbody = new Rigidbody();
@@ -45,14 +47,30 @@ namespace FinalGame
             /*Debug.WriteLine("Forward: " + ((this.Transform.LocalPosition + this.Transform.Forward).Y) +
                 "Backward: " + (Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Backward * Time.ElapsedGameTime * 10f)));*/
             //Control the player
-            if (InputManager.IsKeyDown(Keys.W) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Forward * Time.ElapsedGameTime * 10f) > 1)) //move forward
+            if (InputManager.IsKeyDown(Keys.W) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Forward * Time.ElapsedGameTime * 10f) > 1))//move forward
+            {
                 this.Transform.LocalPosition += this.Transform.Forward * Time.ElapsedGameTime * 10f;
+                Camera.Transform.LocalPosition = this.Transform.Position;
+            }
             if (InputManager.IsKeyDown(Keys.S) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Backward * Time.ElapsedGameTime * 10f) > 1)) //move backward
+            { 
                 this.Transform.LocalPosition += this.Transform.Backward * Time.ElapsedGameTime * 10f;
+                Camera.Transform.LocalPosition = this.Transform.Position;
+            }
             if (InputManager.IsKeyDown(Keys.A) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Left * Time.ElapsedGameTime * 10f) > 1)) //move left
-                this.Transform.LocalPosition += this.Transform.Left * Time.ElapsedGameTime * 10f;
+            {
+                //this.Transform.LocalPosition += this.Transform.Left * Time.ElapsedGameTime * 10f;
+                this.Transform.Rotate(new Vector3(0, 2, 0), Time.ElapsedGameTime);
+                Camera.Transform.LocalPosition = this.Transform.Position;
+                Camera.Transform.Rotate(new Vector3(0,2,0), Time.ElapsedGameTime);
+            }
             if (InputManager.IsKeyDown(Keys.D) && !(Terrain.GetAltitude(this.Transform.LocalPosition + this.Transform.Right * Time.ElapsedGameTime * 10f) > 1)) //move right
-                this.Transform.LocalPosition += this.Transform.Right * Time.ElapsedGameTime * 10f;
+            {
+                //this.Transform.LocalPosition += this.Transform.Right * Time.ElapsedGameTime * 10f;
+                this.Transform.Rotate(new Vector3(0, -2, 0), Time.ElapsedGameTime);
+                Camera.Transform.LocalPosition = this.Transform.Position;
+                Camera.Transform.Rotate(new Vector3(0, -2, 0), Time.ElapsedGameTime);
+            }
 
 
             //make sure that the player is at the right altitude of the terrain

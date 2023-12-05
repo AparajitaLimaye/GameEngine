@@ -99,7 +99,7 @@ namespace FinalGame
             camera = new Camera();
             camera.Transform = new Transform();
             //First Person View
-            camera.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right*3 + Vector3.Up * 4w;
+            camera.Transform.LocalPosition = Vector3.Backward * 5 + Vector3.Right*3 + Vector3.Up * 4;
             //Top Down
             /*camera.Transform.LocalPosition = Vector3.Up * 50;
             camera.Transform.Rotate(Vector3.Left, MathHelper.PiOver2 - 0.2f);*/
